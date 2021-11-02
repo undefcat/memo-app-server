@@ -10,6 +10,24 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MemoController extends Controller
 {
+    public function index(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $count = 20;
+
+        $user = Auth::user();
+        $paginator = $user
+            ->memos()
+            ->paginate($count);
+
+        return response()->json([
+            'memos' => $paginator->items(),
+            'page' => [
+                'current' => $paginator->currentPage(),
+                'has_next' => $paginator->hasMorePages(),
+            ],
+        ]);
+    }
+
     public function store(MemoRequest $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->validated();
