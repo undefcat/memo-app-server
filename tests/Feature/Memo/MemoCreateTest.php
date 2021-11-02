@@ -86,12 +86,8 @@ class MemoCreateTest extends TestCase
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
-    private function memoUrl(?Memo $memo = null): string
+    private function memoUrl(): string
     {
-        if ($memo === null) {
-            return route(self::MEMO_STORE_ROUTE_NAME);
-        }
-
-        return route(self::MEMO_STORE_ROUTE_NAME, ['mid' => $memo->id]);
+        return route(self::MEMO_STORE_ROUTE_NAME);
     }
 }
