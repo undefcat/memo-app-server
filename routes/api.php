@@ -12,4 +12,8 @@ Route::post('sign-up', [\App\Http\Controllers\UserController::class, 'signUp'])
 Route::middleware('auth')->prefix('memos')->group(function () {
     Route::post('/', [\App\Http\Controllers\MemoController::class, 'store'])
         ->name('memo.store');
+
+    Route::delete('/{mid}', [\App\Http\Controllers\MemoController::class, 'destroy'])
+        ->where('mid', '[0-9]+')
+        ->name('memo.destroy');
 });
