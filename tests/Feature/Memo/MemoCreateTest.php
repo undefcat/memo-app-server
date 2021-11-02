@@ -9,7 +9,7 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
-class CreateMemoTest extends TestCase
+class MemoCreateTest extends TestCase
 {
     use RefreshDatabase;
 

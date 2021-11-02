@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
-class DeleteMemoTest extends TestCase
+class MemoDeleteTest extends TestCase
 {
     use RefreshDatabase;
 
