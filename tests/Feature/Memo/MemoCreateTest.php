@@ -70,7 +70,9 @@ class MemoCreateTest extends TestCase
         $this->assertNotEmpty($memo);
         $this->assertEquals(count($files), $memo->files()->count());
 
-        $files->each(fn ($file) => Storage::disk('public')->assertExists($file->hashName('memo')));
+        $files->each(fn ($file) =>
+            Storage::disk('public')->assertExists($file->hashName('memo'))
+        );
     }
 
     public function test_메모_생성_비회원_401_실패(): void
