@@ -12,6 +12,10 @@ Route::middleware('auth')->prefix('memos')->group(function () {
     Route::get('/', [\App\Http\Controllers\MemoController::class, 'index'])
         ->name('memo.index');
 
+    Route::get('/{mid}', [\App\Http\Controllers\MemoController::class, 'show'])
+        ->where('mid', '[0-9]+')
+        ->name('memo.show');
+
     Route::post('/', [\App\Http\Controllers\MemoController::class, 'store'])
         ->name('memo.store');
 

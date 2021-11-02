@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Memo;
 
+use App\Models\File;
 use App\Models\Memo;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -20,6 +21,8 @@ class MemoReadTest extends TestCase
 
     private const MEMO_INDEX_ROUTE_NAME = 'memo.index';
 
+    private const MEMO_SHOW_ROUTE_NAME = 'memo.show';
+
     public function test_메모_1페이지_가져오기_200_성공(): void
     {
         $this->getJsonPage(50, 1);
@@ -35,22 +38,62 @@ class MemoReadTest extends TestCase
         $this->getJsonPage(50, 3);
     }
 
+    public function test_메모_가져오기_200_성공(): void
+    {
+        $user = User::factory()->create();
+        $memo = Memo::factory()
+            ->for($user)
+            ->has(File::factory()->count(3), 'files')
+            ->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->getJson($this->showUrl($memo));
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson(fn (AssertableJson $json) =>
+            $json
+                ->has('memo', fn (AssertableJson $memoJson) =>
+                    $memoJson
+                        ->has('id')
+                        ->has('title')
+                        ->has('content')
+                        ->has('date')
+                )
+                ->has('files', 3)
+                ->has('files.0', fn (AssertableJson $filesJson) =>
+                    $filesJson
+                        ->whereType('name', ['string'])
+                        ->whereType('size', ['integer'])
+                        ->whereType('mime_type', ['string'])
+                        ->whereType('mime_subtype', ['string'])
+                        ->whereType('url', ['string'])
+                )
+        );
+    }
+
     public function test_메모_목록_비회원_401_실패(): void
     {
-        $response = $this->getJson($this->memoUrl());
+        $response = $this->getJson($this->indexUrl());
 
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
     private function getJsonPage(int $count, int $page): \Illuminate\Testing\TestResponse
     {
+        $fileCount = 3;
+
+        $memos = Memo::factory()
+            ->has(File::factory()->count($fileCount), 'files')
+            ->count($count);
+
         $user = User::factory()
-            ->has(Memo::factory()->count($count))
+            ->has($memos)
             ->create();
 
         $response = $this
             ->actingAs($user)
-            ->getJson($this->memoUrl($page));
+            ->getJson($this->indexUrl($page));
 
         $hasNext = ceil($count / self::PER_PAGE) > $page;
 
@@ -73,8 +116,13 @@ class MemoReadTest extends TestCase
         return $response;
     }
 
-    private function memoUrl(int $page = 1): string
+    private function indexUrl(int $page = 1): string
     {
         return route(self::MEMO_INDEX_ROUTE_NAME, ['page' => $page]);
+    }
+
+    private function showUrl(Memo $memo): string
+    {
+        return route(self::MEMO_SHOW_ROUTE_NAME, ['mid' => $memo->id]);
     }
 }

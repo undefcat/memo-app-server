@@ -10,6 +10,11 @@ class MemoPolicy
 {
     use HandlesAuthorization;
 
+    public function show(User $user, Memo $memo): bool
+    {
+        return $this->isOwner($user, $memo);
+    }
+
     public function update(User $user, Memo $memo): bool
     {
         return $this->isOwner($user, $memo);

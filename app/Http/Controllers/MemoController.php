@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MemoRequest;
+use App\Http\Resources\FileResource;
+use App\Http\Resources\MemoResource;
 use App\Models\File;
 use App\Models\Memo;
 use Illuminate\Http\Request;
@@ -33,6 +35,34 @@ class MemoController extends Controller
                 'current' => $paginator->currentPage(),
                 'has_next' => $paginator->hasMorePages(),
             ],
+        ]);
+    }
+
+    /**
+     * 메모를 가져온다.
+     *
+     * @param Request $request
+     * @param string $mid
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show(Request $request, string $mid): \Illuminate\Http\JsonResponse
+    {
+        $memo = Memo::with('files')
+            ->findOrFail($mid);
+        $user = Auth::user();
+
+        if ($user->cannot('show', $memo)) {
+            return response()->json(null, Response::HTTP_NOT_FOUND);
+        }
+
+        $files = FileResource::collection($memo->files);
+        unset($memo->files);
+
+        $memo = new MemoResource($memo);
+
+        return response()->json([
+            'memo' => $memo,
+            'files' => $files,
         ]);
     }
 
