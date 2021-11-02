@@ -77,4 +77,15 @@ class UserController extends Controller
 
         return response()->json(null, Response::HTTP_CREATED);
     }
+
+    public function signOut(): \Illuminate\Http\JsonResponse
+    {
+        Auth::logout();
+
+        session()->flush();
+        session()->regenerate(true);
+
+        return response()
+            ->json(null, Response::HTTP_NO_CONTENT);
+    }
 }

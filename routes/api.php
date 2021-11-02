@@ -8,6 +8,9 @@ Route::post('sign-in', [\App\Http\Controllers\UserController::class, 'signIn'])
 Route::post('sign-up', [\App\Http\Controllers\UserController::class, 'signUp'])
     ->name('sign-up');
 
+Route::get('sign-out', [\App\Http\Controllers\UserController::class, 'signOut'])
+    ->name('sign-out');
+
 Route::middleware('auth')->prefix('memos')->group(function () {
     Route::get('/', [\App\Http\Controllers\MemoController::class, 'index'])
         ->name('memo.index');
