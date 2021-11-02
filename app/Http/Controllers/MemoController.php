@@ -12,6 +12,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MemoController extends Controller
 {
+    /**
+     * 현재 로그인된 사용자의 메모 목록(20개)를 가져온다.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         $count = 20;
@@ -30,6 +36,12 @@ class MemoController extends Controller
         ]);
     }
 
+    /**
+     * 메모를 저장한다.
+     *
+     * @param MemoRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(MemoRequest $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->validated();
@@ -67,7 +79,14 @@ class MemoController extends Controller
         ], Response::HTTP_CREATED);
     }
 
-    public function update(MemoRequest $request, string $mid)
+    /**
+     * 메모를 수정한다.
+     *
+     * @param MemoRequest $request
+     * @param string $mid
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(MemoRequest $request, string $mid): \Illuminate\Http\JsonResponse
     {
         $data = $request->validated();
 
@@ -89,6 +108,13 @@ class MemoController extends Controller
         ], Response::HTTP_OK);
     }
 
+    /**
+     * 메모를 삭제한다.
+     *
+     * @param Request $request
+     * @param string $mid
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy(Request $request, string $mid): \Illuminate\Http\JsonResponse
     {
         $memo = Memo::findOrFail($mid);
