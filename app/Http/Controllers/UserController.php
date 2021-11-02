@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -36,5 +37,44 @@ class UserController extends Controller
         }
 
         return response()->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function signUp(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $rules = [
+            'account' => ['required', 'between:2,60'],
+            'password' => ['required', 'confirmed', 'between:4,20'],
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => true,
+                'messages' => $validator->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $data = $validator->validated();
+
+        $isExist = User::where('account', '=', $data['account'])
+            ->count() > 0;
+
+        if ($isExist) {
+            return response()->json([
+                'error' => true,
+                'messages' => [
+                    'account' => ['이미 존재하는 계정입니다.'],
+                ],
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $user = new User();
+
+        $user->account = $data['account'];
+        $user->password = bcrypt($data['password']);
+
+        $user->save();
+
+        return response()->json(null, Response::HTTP_CREATED);
     }
 }
