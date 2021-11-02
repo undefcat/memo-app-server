@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MemoRequest;
+use App\Models\File;
 use App\Models\Memo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
 class MemoController extends Controller
@@ -39,6 +41,25 @@ class MemoController extends Controller
         $memo->content = $data['content'];
 
         $memo->save();
+
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $attachment) {
+                $path = Storage::disk('public')->put('memo', $attachment);
+
+                [$type, $subType] = explode('/', $attachment->getMimeType());
+
+                $file = new File();
+
+                $file->size = $attachment->getSize();
+                $file->tag = 'file';
+                $file->mime_type = $type;
+                $file->mime_subtype = $subType;
+                $file->original_name = $attachment->getClientOriginalName();
+                $file->path = $path;
+
+                $memo->files()->save($file);
+            }
+        }
 
         return response()->json([
             'error' => false,

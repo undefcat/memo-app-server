@@ -14,6 +14,8 @@ class MemoRequest extends FormRequest
         return [
             'title' => ['required', 'between:1,250'],
             'content' => ['required'],
+            'files' => ['nullable'],
+            'files.*' => ['file'],
         ];
     }
 
