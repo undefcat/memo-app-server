@@ -12,10 +12,15 @@ class MemoPolicy
 
     public function update(User $user, Memo $memo): bool
     {
-        return (string)$user->id === (string)$memo->user_id;
+        return $this->isOwner($user, $memo);
     }
 
     public function destroy(User $user, Memo $memo): bool
+    {
+        return $this->isOwner($user, $memo);
+    }
+
+    private function isOwner(User $user, Memo $memo): bool
     {
         return (string)$user->id === (string)$memo->user_id;
     }
