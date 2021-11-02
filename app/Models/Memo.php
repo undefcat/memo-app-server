@@ -13,4 +13,9 @@ class Memo extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function files(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(File::class, 'fileable');
+    }
 }
