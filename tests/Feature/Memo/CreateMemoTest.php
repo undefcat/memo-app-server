@@ -15,15 +15,6 @@ class CreateMemoTest extends TestCase
 
     private const MEMO_STORE_ROUTE_NAME = 'memo.store';
 
-    private User $user;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->user = User::factory()->create();
-    }
-
     public function test_메모_생성_및_id값_리턴_201_성공(): void
     {
         $formData = [
@@ -32,7 +23,7 @@ class CreateMemoTest extends TestCase
         ];
 
         $response = $this
-            ->actingAs($this->user)
+            ->actingAs(User::factory()->create())
             ->postJson($this->memoUrl(), $formData);
 
         $response->assertStatus(Response::HTTP_CREATED);
