@@ -11,7 +11,7 @@ Route::post('sign-up', [\App\Http\Controllers\UserController::class, 'signUp'])
 Route::get('sign-out', [\App\Http\Controllers\UserController::class, 'signOut'])
     ->name('sign-out');
 
-Route::middleware('auth')->prefix('memos')->group(function () {
+Route::middleware('auth:sanctum')->prefix('memos')->group(function () {
     Route::get('/', [\App\Http\Controllers\MemoController::class, 'index'])
         ->name('memo.index');
 

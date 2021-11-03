@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,7 +28,11 @@ class UserController extends Controller
 
         $credential = $validator->validated();
 
-        if (!Auth::attempt($credential)) {
+        $user = User::where('account', '=', $credential['account'])
+            ->first();
+
+        // 아이디가 없는 경우
+        if (empty($user)) {
             return response()->json([
                 'error' => true,
                 'messages' => [
@@ -36,7 +41,21 @@ class UserController extends Controller
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        // 비밀번호가 맞지 않는 경우
+        if (!Hash::check($credential['password'], $user->password)) {
+            return response()->json([
+                'error' => true,
+                'messages' => [
+                    'login' => ['아이디 혹은 비밀번호가 올바르지 않아요.'],
+                ],
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $token = $user->createToken('memo');
+
+        return response()->json([
+            'token' => $token->plainTextToken,
+        ]);
     }
 
     public function signUp(Request $request): \Illuminate\Http\JsonResponse
