@@ -4,6 +4,7 @@ namespace Tests\Feature\User;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
@@ -13,7 +14,7 @@ class UserSignInTest extends TestCase
 
     private const LOGIN_ROUTE_NAME = 'sign-in';
 
-    public function test_회원_로그인_204_성공(): void
+    public function test_회원_로그인_토큰_응답_200_성공(): void
     {
         $user = User::factory()->create();
 
@@ -22,7 +23,11 @@ class UserSignInTest extends TestCase
             'password' => 'password',
         ];
 
-        $this->postJsonAssertStatus($credential, Response::HTTP_NO_CONTENT);
+        $response = $this->postJsonAssertStatus($credential, Response::HTTP_OK);
+
+        $response->assertJson(fn (AssertableJson $json) =>
+            $json->has('token')
+        );
     }
 
     public function test_회원_로그인_존재하지_않는_계정_401_실패(): void
