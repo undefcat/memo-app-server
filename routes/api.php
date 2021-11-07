@@ -30,3 +30,8 @@ Route::middleware('auth:sanctum')->prefix('memos')->group(function () {
         ->whereNumber('mid')
         ->name('memo.update');
 });
+
+Route::middleware('auth:sanctum')->prefix('token')->group(function () {
+    Route::get('/check', [\App\Http\Controllers\TokenController::class, 'check'])
+        ->name('token.check');
+});
