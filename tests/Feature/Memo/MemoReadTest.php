@@ -59,9 +59,10 @@ class MemoReadTest extends TestCase
                         ->has('title')
                         ->has('content')
                         ->has('date')
+                        ->has('files')
                 )
-                ->has('files', 3)
-                ->has('files.0', fn (AssertableJson $filesJson) =>
+                ->has('memo.files', 3)
+                ->has('memo.files.0', fn (AssertableJson $filesJson) =>
                     $filesJson
                         ->whereType('name', ['string'])
                         ->whereType('size', ['integer'])
@@ -109,6 +110,14 @@ class MemoReadTest extends TestCase
         $response->assertJson(fn (AssertableJson $json) =>
         $json
             ->has('memos', $currentPageSize)
+            ->has('memos.0.files.0', fn (AssertableJson $filesJson) =>
+                $filesJson
+                    ->whereType('name', ['string'])
+                    ->whereType('size', ['integer'])
+                    ->whereType('mime_type', ['string'])
+                    ->whereType('mime_subtype', ['string'])
+                    ->whereType('url', ['string'])
+            )
             ->where('page.current', $page)
             ->where('page.has_next', $hasNext)
         );

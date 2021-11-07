@@ -13,6 +13,7 @@ class MemoResource extends JsonResource
             'title' => $this->title,
             'content' => $this->content,
             'date' => $this->created_at,
+            'files' => FileResource::collection($this->files),
         ];
     }
 }

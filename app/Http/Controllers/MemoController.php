@@ -27,10 +27,13 @@ class MemoController extends Controller
         $user = Auth::user();
         $paginator = $user
             ->memos()
+            ->with('files')
             ->paginate($count);
 
+        $memos = MemoResource::collection($paginator->items());
+
         return response()->json([
-            'memos' => $paginator->items(),
+            'memos' => $memos,
             'page' => [
                 'current' => $paginator->currentPage(),
                 'has_next' => $paginator->hasMorePages(),
@@ -55,14 +58,14 @@ class MemoController extends Controller
             return response()->json(null, Response::HTTP_NOT_FOUND);
         }
 
-        $files = FileResource::collection($memo->files);
         unset($memo->files);
 
         $memo = new MemoResource($memo);
 
+        unset($memo->files);
+
         return response()->json([
             'memo' => $memo,
-            'files' => $files,
         ]);
     }
 
